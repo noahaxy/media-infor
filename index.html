@@ -143,6 +143,7 @@
                 <button onclick="switchTab('posttest')" id="nav-posttest" class="tab-btn px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5 text-gray-400 hover:text-white">
                     <i class="fa-solid fa-award"></i> <span>Post-test</span>
                 </button>
+                
             </nav>
         </div>
     </header>
@@ -796,7 +797,7 @@ function doPost(e) {
 
     <!-- FOOTER -->
     <footer class="border-t border-gray-800 glass-panel py-4 text-center text-xs text-gray-500">
-        <p>© 2026 Media Pembelajaran Informatika Kelas X — Interaksi Manusia Komputer & Cara Kerja Software</p>
+        <p>© 2026 Media Pembelajaran Informatika Kelas X — Sistem Komputer oleh Fia Siahaan, S.T</p>
     </footer>
 
     <script>
@@ -1437,8 +1438,7 @@ function doPost(e) {
 
             // Check saved sheets URL
             if(state.sheetsUrl) {
-                const sheetsInput = document.getElementById('sheets-script-url');
-                if (sheetsInput) sheetsInput.value = state.sheetsUrl;
+                document.getElementById('sheets-script-url').value = state.sheetsUrl;
                 updateDbStatusTag(true);
             }
 
