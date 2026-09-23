@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Pembelajaran Sistem Komputer - Kelas X Informatika</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81',
+                        },
+                        cyber: {
+                            blue: '#00f0ff',
+                            purple: '#7000ff',
+                            green: '#00ff66',
+                            pink: '#ff0055',
+                            gold: '#ffb700'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Fira Code', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts & FontAwesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Three.js Library for 3D Interactive Visualizer -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0b0f19;
+            color: #f3f4f6;
+            overflow-x: hidden;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111827;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4b5563;
+        }
+
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-card {
+            background: rgba(31, 41, 55, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .glow-text {
+            text-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+        }
+
+        .glow-blue {
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.25);
+        }
+
+        /* Canvas container positioning */
+        #canvas-container {
+            width: 100%;
+            height: 480px;
+            position: relative;
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+
+        /* Pulse Animations */
+        @keyframes pulse-border {
+            0%, 100% { border-color: rgba(99, 102, 241, 0.4); }
+            50% { border-color: rgba(99, 102, 241, 1); }
+        }
+        .animate-pulse-border {
+            animation: pulse-border 2s infinite;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+    <!-- HEADER NAVBAR -->
+    <header class="sticky top-0 z-50 glass-panel border-b border-gray-800 px-4 lg:px-8 py-3">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-cyber-blue flex items-center justify-center text-white shadow-lg shadow-brand-500/30">
+                    <i class="fa-solid fa-microchip text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold bg-gradient-to-r from-white via-gray-200 to-brand-500 bg-clip-text text-transparent">
+                        Simulasi Sistem Komputer
+                    </h1>
+                    <p class="text-xs text-gray-400">Kelas X Informatika — Fase E (IMK & Cara Kerja Software)</p>
+                </div>
+            </div>
+
+            <!-- Navigation Tabs -->
+            <nav class="flex flex-wrap items-center justify-center gap-1 bg-gray-900/80 p-1.5 rounded-xl border border-gray-800 text-xs sm:text-sm">
+                <button onclick="switchTab('pretest')" id="nav-pretest" class="tab-btn px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5 text-gray-400 hover:text-white">
+                    <i class="fa-solid fa-clipboard-question"></i> <span>Pre-test</span>
+                </button>
+                <button onclick="switchTab('materi')" id="nav-materi" class="tab-btn px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5 text-gray-400 hover:text-white">
+                    <i class="fa-solid fa-book-open"></i> <span>Materi</span>
+                </button>
+                <button onclick="switchTab('simulasi')" id="nav-simulasi" class="tab-btn px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5 active bg-brand-600 text-white shadow-md">
+                    <i class="fa-solid fa-cube"></i> <span>Simulasi 3D</span>
+                </button>
+                <button onclick="switchTab('lkpd')" id="nav-lkpd" class="tab-btn px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5 text-gray-400 hover:text-white">
+                    <i class="fa-solid fa-file-pen"></i> <span>LKPD</span>
+                </button>
+                <button onclick="switchTab('posttest')" id="nav-posttest" class="tab-btn px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5 text-gray-400 hover:text-white">
+                    <i class="fa-solid fa-award"></i> <span>Post-test</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex-grow">
+
+        <!-- Toast Notification Area -->
+        <div id="toast-container" class="fixed top-20 right-5 z-50 flex flex-col gap-2"></div>
+
+        <!-- Dynamic User Identity Banner -->
+        <div class="mb-6 p-4 rounded-xl glass-card flex flex-col sm:flex-row items-center justify-between gap-4 border-l-4 border-brand-500">
+            <div class="flex items-center gap-3">
+                <div class="p-2.5 rounded-lg bg-gray-800 text-brand-500">
+                    <i class="fa-solid fa-user-graduate text-xl"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Siswa Aktif:</span>
+                        <span id="display-user-name" class="font-bold text-white text-sm sm:text-base">Belum Mengisi Identitas</span>
+                    </div>
+                    <p id="display-user-group" class="text-xs text-gray-400">Silakan isi nama pada tab LKPD atau Pre-test untuk menyimpan nilai.</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <span id="sync-status-badge" class="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1.5">
+                    <i class="fa-solid fa-circle-notch fa-spin"></i> Sheets Belum Terhubung
+                </span>
+            </div>
+        </div>
+
+        <!-- ==================== TAB 1: PRE-TEST ==================== -->
+        <section id="section-pretest" class="tab-content hidden space-y-6">
+            <div class="glass-panel p-6 rounded-2xl border border-gray-800">
+                <div class="flex items-center justify-between border-b border-gray-800 pb-4 mb-6">
+                    <div>
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-clipboard-question text-brand-500"></i>
+                            Asesmen Diagnostik (Pre-Test)
+                        </h2>
+                        <p class="text-sm text-gray-400 mt-1">Ukur pemahaman awalmu sebelum mempelajari materi interaksi manusia-komputer dan cara kerja software.</p>
+                    </div>
+                    <span class="px-3 py-1 rounded-full bg-brand-500/10 text-brand-400 border border-brand-500/30 text-xs font-mono">5 Soal Singkat</span>
+                </div>
+
+                <!-- Form Identitas Singkat Pretest -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 p-4 rounded-xl bg-gray-900/60 border border-gray-800">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-300 mb-1">Nama Lengkap Siswa *</label>
+                        <input type="text" id="pretest-student-name" placeholder="Masukkan nama lengkap" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-300 mb-1">Kelas & Kelompok *</label>
+                        <input type="text" id="pretest-student-class" placeholder="Contoh: X-1 / Kelompok 3" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500">
+                    </div>
+                </div>
+
+                <!-- Soal Pretest Container -->
+                <form id="pretest-form" class="space-y-6">
+                    <div id="pretest-questions" class="space-y-6">
+                        <!-- Questions injected dynamically -->
+                    </div>
+
+                    <div class="pt-4 border-t border-gray-800 flex justify-end">
+                        <button type="button" onclick="submitPretest()" class="px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-semibold shadow-lg shadow-brand-500/25 transition flex items-center gap-2">
+                            <i class="fa-solid fa-paper-plane"></i> Kirim Jawaban Pre-Test
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Pretest Result Box -->
+                <div id="pretest-result" class="hidden mt-6 p-6 rounded-xl bg-gradient-to-r from-brand-900/40 to-purple-900/40 border border-brand-500/30 text-center">
+                    <i class="fa-solid fa-circle-check text-4xl text-cyber-green mb-2"></i>
+                    <h3 class="text-xl font-bold text-white">Pre-Test Selesai!</h3>
+                    <p class="text-gray-300 text-sm mt-1">Skor Awal Anda: <span id="pretest-score" class="text-2xl font-black text-cyber-blue font-mono">0</span> / 100</p>
+                    <p class="text-xs text-gray-400 mt-2">Nilai pretest telah tersimpan. Sekarang silakan pelajari **Materi** dan jalankan **Simulasi 3D**.</p>
+                    <button onclick="switchTab('materi')" class="mt-4 px-5 py-2 rounded-lg bg-brand-500 text-white text-xs font-semibold hover:bg-brand-600 transition">
+                        Lanjut ke Materi Pembelajaran <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 2: MATERI PEMBELAJARAN ==================== -->
+        <section id="section-materi" class="tab-content hidden space-y-6">
+            <div class="flex border-b border-gray-800 gap-2 overflow-x-auto pb-2">
+                <button onclick="switchMateriSubTab('materi-p1')" id="subnav-materi-p1" class="px-4 py-2 rounded-lg text-sm font-semibold transition bg-brand-600 text-white flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-hand-pointer"></i> Pertemuan 1: Interaksi Manusia & Komputer
+                </button>
+                <button onclick="switchMateriSubTab('materi-p2')" id="subnav-materi-p2" class="px-4 py-2 rounded-lg text-sm font-semibold transition bg-gray-800 text-gray-400 hover:text-white flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-window-restore"></i> Pertemuan 2: Software & Sistem Operasi
+                </button>
+            </div>
+
+            <!-- Pertemuan 1 Content -->
+            <div id="materi-p1" class="materi-subcontent space-y-6">
+                <div class="glass-panel p-6 rounded-2xl border border-gray-800">
+                    <h3 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-arrows-split-up-and-left text-cyber-blue"></i> Konsep Interaksi Manusia dan Komputer (IMK)
+                    </h3>
+                    <p class="text-sm text-gray-300 leading-relaxed mb-4">
+                        Sistem komputasi terdiri atas perangkat keras (hardware) dan perangkat lunak (software) yang saling berinteraksi. Antarmuka (interface) menjadi jembatan penghubung antara pengguna dengan sistem komputer.
+                    </p>
+
+                    <!-- Concept Flow Visualization Banner -->
+                    <div class="p-4 rounded-xl bg-gray-900 border border-gray-800 flex flex-wrap items-center justify-between gap-2 text-center text-xs sm:text-sm font-semibold">
+                        <span class="px-3 py-2 rounded-lg bg-brand-900/60 text-brand-300 border border-brand-500/30">Manusia (User)</span>
+                        <i class="fa-solid fa-chevron-right text-gray-600"></i>
+                        <span class="px-3 py-2 rounded-lg bg-cyber-blue/10 text-cyber-blue border border-cyber-blue/30">Antarmuka (Interface)</span>
+                        <i class="fa-solid fa-chevron-right text-gray-600"></i>
+                        <span class="px-3 py-2 rounded-lg bg-purple-900/60 text-purple-300 border border-purple-500/30">Software (Aplikasi & OS)</span>
+                        <i class="fa-solid fa-chevron-right text-gray-600"></i>
+                        <span class="px-3 py-2 rounded-lg bg-amber-900/60 text-amber-300 border border-amber-500/30">Hardware (CPU/RAM)</span>
+                        <i class="fa-solid fa-chevron-right text-gray-600"></i>
+                        <span class="px-3 py-2 rounded-lg bg-cyber-green/10 text-cyber-green border border-cyber-green/30">Output (Layar/Suara)</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="glass-card p-5 rounded-xl border border-gray-800 hover:border-brand-500/50 transition">
+                        <div class="w-10 h-10 rounded-lg bg-cyber-blue/10 text-cyber-blue flex items-center justify-center text-lg mb-3">
+                            <i class="fa-solid fa-desktop"></i>
+                        </div>
+                        <h4 class="font-bold text-white text-base mb-1">1. GUI (Graphical User Interface)</h4>
+                        <p class="text-xs text-gray-400">Interaksi berbasis visual menggunakan ikon, menu, tombol, textbox, radio button, dan jendela visual.</p>
+                    </div>
+
+                    <div class="glass-card p-5 rounded-xl border border-gray-800 hover:border-brand-500/50 transition">
+                        <div class="w-10 h-10 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center text-lg mb-3">
+                            <i class="fa-solid fa-terminal"></i>
+                        </div>
+                        <h4 class="font-bold text-white text-base mb-1">2. CLI (Command Line Interface)</h4>
+                        <p class="text-xs text-gray-400">Interaksi berbasis perintah teks secara langsung melalui terminal atau Command Prompt tanpa grafik.</p>
+                    </div>
+
+                    <div class="glass-card p-5 rounded-xl border border-gray-800 hover:border-brand-500/50 transition">
+                        <div class="w-10 h-10 rounded-lg bg-cyber-pink/10 text-cyber-pink flex items-center justify-center text-lg mb-3">
+                            <i class="fa-solid fa-microphone font-bold"></i>
+                        </div>
+                        <h4 class="font-bold text-white text-base mb-1">3. Audio / Voice Interface</h4>
+                        <p class="text-xs text-gray-400">Interaksi menggunakan perintah suara pengguna (seperti Google Assistant atau Siri).</p>
+                    </div>
+
+                    <div class="glass-card p-5 rounded-xl border border-gray-800 hover:border-brand-500/50 transition">
+                        <div class="w-10 h-10 rounded-lg bg-cyber-green/10 text-cyber-green flex items-center justify-center text-lg mb-3">
+                            <i class="fa-solid fa-camera"></i>
+                        </div>
+                        <h4 class="font-bold text-white text-base mb-1">4. Gambar / Video</h4>
+                        <p class="text-xs text-gray-400">Interaksi menggunakan deteksi kamera, face recognition, gesture tracking, dan pemrosesan visual.</p>
+                    </div>
+
+                    <div class="glass-card p-5 rounded-xl border border-gray-800 hover:border-brand-500/50 transition md:col-span-2 lg:col-span-2">
+                        <div class="w-10 h-10 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg mb-3">
+                            <i class="fa-solid fa-keyboard"></i>
+                        </div>
+                        <h4 class="font-bold text-white text-base mb-1">5. Piranti Masukan (Input Hardware)</h4>
+                        <p class="text-xs text-gray-400">Keyboard fisik/virtual, mouse, touchpad, touchscreen, joystick, dan sensor fisik yang merespons tindakan manusia menjadi sinyal digital.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pertemuan 2 Content -->
+            <div id="materi-p2" class="materi-subcontent hidden space-y-6">
+                <div class="glass-panel p-6 rounded-2xl border border-gray-800">
+                    <h3 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-layer-group text-cyber-green"></i> Klasifikasi Software & Peran Sistem Operasi
+                    </h3>
+                    <p class="text-sm text-gray-300 leading-relaxed mb-4">
+                        Software dikelompokkan menjadi **System Software** (Sistem Operasi seperti Windows, Linux, macOS, Android) dan **Application Software** (seperti Chrome, CapCut, Ms Word, WhatsApp).
+                    </p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
+                        <div class="p-4 rounded-xl bg-gray-900 border border-gray-800">
+                            <h4 class="font-bold text-brand-400 text-sm mb-2"><i class="fa-solid fa-gears mr-1"></i> System Software (OS)</h4>
+                            <p class="text-xs text-gray-300">Menjadi pengelola utama sumber daya komputer (hardware & memory), menjembatani aplikasi dengan perangkat keras.</p>
+                        </div>
+                        <div class="p-4 rounded-xl bg-gray-900 border border-gray-800">
+                            <h4 class="font-bold text-cyber-blue text-sm mb-2"><i class="fa-solid fa-shapes mr-1"></i> Application Software</h4>
+                            <p class="text-xs text-gray-300">Program khusus yang dirancang untuk menyelesaikan tugas spesifik pengguna (mengedit, mengetik, browsing, dll).</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 10 Fungsi Utama Sistem Operasi Grid -->
+                <div class="glass-panel p-6 rounded-2xl border border-gray-800">
+                    <h3 class="text-md font-bold text-white mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-cyber-gold"></i> 10 Fungsi Utama Sistem Operasi (OS)
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                        <div class="p-3 rounded-xl bg-gray-900/80 border border-gray-800 text-xs">
+                            <span class="text-brand-400 font-bold">1. Antarmuka</span>
+                            <p class="text-gray-400 text-[11px] mt-1">Sediakan GUI/CLI untuk interaksi user.</p>
+                        </div>
+                        <div class="p-3 rounded-xl bg-gray-900/80 border border-gray-800 text-xs">
+                            <span class="text-brand-400 font-bold">2. Kontrol I/O</span>
+                            <p class="text-gray-400 text-[11px] mt-1">Kelola masukan & keluaran data.</p>
+                        </div>
+                        <div class="p-3 rounded-xl bg-gray-900/80 border border-gray-800 text-xs">
+                            <span class="text-brand-400 font-bold">3. Periferal</span>
+                            <p class="text-gray-400 text-[11px] mt-1">Atur printer, mouse, keyboard.</p>
+                        </div>
+                        <div class="p-3 rounded-xl bg-gray-900/80 border border-gray-800 text-xs">
+                            <span class="text-brand-400 font-bold">4. Eksekusi App</span>
+                            <p class="text-gray-400 text-[11px] mt-1">Jalankan dan tutup aplikasi.</p>
+                        </div>
+                        <div class="p-3 rounded-xl bg-gray-900/80 border border-gray-800 text-xs">
+                            <span class="text-brand-400 font-bold">5. Kelola File</span>
+                            <p class="text-gray-400 text-[11px] mt-1">Atur struktur folder & berkas.</p>
+                        </div>
+                        <div class="p-3 rounded-xl bg-gray-900/80 border border-gray-800 text-xs">
+                            <span class="text-cyber-green font-bold">6. Kelola CPU</span>
+                            <p class="text-gray-400 text-[11px] mt-1">Scheduler pembagian giliran CPU.</p>
+                        </div>
+                        <div class="p-3 rounded-xl bg-gray-900/80 border border-gray-800 text-xs">
+                            <span class="text-cyber-green font-bold">7. Kelola Memori</span>
+                            <p class="text-gray-400 text-[11px] mt-1">Alokasikan ruang RAM aplikasi.</p>
+                        </div>
+                        <div class="p-3 rounded-xl bg-gray-900/80 border border-gray-800 text-xs">
+                            <span class="text-cyber-green font-bold">8. Multitasking</span>
+                            <p class="text-gray-400 text-[11px] mt-1">Atur interupsi & jadwal proses.</p>
+                        </div>
+                        <div class="p-3 rounded-xl bg-gray-900/80 border border-gray-800 text-xs">
+                            <span class="text-cyber-green font-bold">9. Keamanan</span>
+                            <p class="text-gray-400 text-[11px] mt-1">Proteksi sandi & hak akses.</p>
+                        </div>
+                        <div class="p-3 rounded-xl bg-gray-900/80 border border-gray-800 text-xs">
+                            <span class="text-cyber-green font-bold">10. Jaringan</span>
+                            <p class="text-gray-400 text-[11px] mt-1">Atur koneksi internet & WiFi.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 3: SIMULASI 3D INTERAKTIF ==================== -->
+        <section id="section-simulasi" class="tab-content space-y-6">
+            
+            <!-- Top Control Bar for 3D Simulation -->
+            <div class="glass-panel p-4 rounded-2xl border border-gray-800 flex flex-wrap items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-cube text-cyber-blue animate-pulse"></i>
+                        Simulator Cara Kerja Software & OS
+                    </h2>
+                    <p class="text-xs text-gray-400">Gunakan mouse/touch untuk memutar & zoom ruang 3D komputasi di bawah.</p>
+                </div>
+
+                <!-- Simulation Mode Selector -->
+                <div class="flex flex-wrap items-center gap-2">
+                    <button onclick="setSimMode('flow')" id="btn-mode-flow" class="sim-mode-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-brand-600 text-white border border-brand-400">
+                        <i class="fa-solid fa-route"></i> Alur Interaksi Data
+                    </button>
+                    <button onclick="setSimMode('scheduler')" id="btn-mode-scheduler" class="sim-mode-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-800 text-gray-300 hover:bg-gray-700">
+                        <i class="fa-solid fa-microchip"></i> Multitasking & CPU Scheduler
+                    </button>
+                    <button onclick="toggleOSState()" id="btn-toggle-os" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-600/50 transition">
+                        <i class="fa-solid fa-power-off"></i> Status OS: AKTIF
+                    </button>
+                </div>
+            </div>
+
+            <!-- 3D Canvas Viewport + Sidebar HUD Controls -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- 3D Canvas Container -->
+                <div class="lg:col-span-2 relative glass-panel rounded-2xl border border-gray-800 overflow-hidden flex flex-col">
+                    <div id="canvas-container"></div>
+                    
+                    <!-- 3D Overlay HUD Stats -->
+                    <div class="absolute top-4 left-4 p-3 rounded-xl bg-gray-900/80 backdrop-blur border border-gray-800 text-xs space-y-1 font-mono pointer-events-none">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-cyber-green animate-ping"></span>
+                            <span class="text-gray-300">Active Process:</span>
+                            <span id="hud-active-app" class="text-cyber-blue font-bold">Chrome.exe</span>
+                        </div>
+                        <div class="text-gray-400">CPU Slice: <span id="hud-cpu-time" class="text-cyber-green font-bold">15ms</span></div>
+                        <div class="text-gray-400">Signal Status: <span id="hud-signal-status" class="text-amber-300">Standby</span></div>
+                    </div>
+
+                    <!-- Interactive Instructions Overlay -->
+                    <div class="p-3 bg-gray-900/90 border-t border-gray-800 flex items-center justify-between text-xs">
+                        <span class="text-gray-400 flex items-center gap-1.5">
+                            <i class="fa-solid fa-circle-info text-brand-400"></i>
+                            <span id="sim-instruction-text">Klik salah satu instruksi aksi di panel kanan untuk melihat sinyal bergerak!</span>
+                        </span>
+                        <button onclick="reset3DCamera()" class="px-2 py-1 rounded bg-gray-800 text-gray-300 hover:text-white text-[11px]">
+                            <i class="fa-solid fa-compress"></i> Reset Kamera
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Simulation Sidebar Controls -->
+                <div class="space-y-4">
+                    <!-- Dynamic Controls Panel (Changes based on mode) -->
+                    <div id="panel-flow-controls" class="glass-panel p-5 rounded-2xl border border-gray-800 space-y-4">
+                        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-gamepad text-brand-400"></i> Pemicu Aksi Interaksi User
+                        </h3>
+                        <p class="text-xs text-gray-400">Pilih salah satu perintah pengguna berikut untuk mengamati alur data dari Input $\rightarrow$ GUI $\rightarrow$ OS $\rightarrow$ CPU/RAM $\rightarrow$ Output:</p>
+
+                        <div class="space-y-2">
+                            <button onclick="triggerSimAction('capcut')" class="w-full text-left p-3 rounded-xl bg-gray-900/80 hover:bg-brand-900/40 border border-gray-800 hover:border-brand-500/50 transition flex items-center justify-between group">
+                                <div class="flex items-center gap-2.5">
+                                    <i class="fa-solid fa-video text-cyber-pink"></i>
+                                    <div>
+                                        <div class="text-xs font-bold text-white group-hover:text-cyber-blue">1. Render Video CapCut</div>
+                                        <div class="text-[10px] text-gray-400">Input Touch $\rightarrow$ CapCut GUI $\rightarrow$ GPU/CPU High Load</div>
+                                    </div>
+                                </div>
+                                <i class="fa-solid fa-play text-xs text-gray-500 group-hover:text-cyber-blue"></i>
+                            </button>
+
+                            <button onclick="triggerSimAction('chrome')" class="w-full text-left p-3 rounded-xl bg-gray-900/80 hover:bg-brand-900/40 border border-gray-800 hover:border-brand-500/50 transition flex items-center justify-between group">
+                                <div class="flex items-center gap-2.5">
+                                    <i class="fa-solid fa-globe text-cyber-blue"></i>
+                                    <div>
+                                        <div class="text-xs font-bold text-white group-hover:text-cyber-blue">2. Browsing / Buka Web Chrome</div>
+                                        <div class="text-[10px] text-gray-400">Keyboard URL $\rightarrow$ OS Network $\rightarrow$ RAM Buffer</div>
+                                    </div>
+                                </div>
+                                <i class="fa-solid fa-play text-xs text-gray-500 group-hover:text-cyber-blue"></i>
+                            </button>
+
+                            <button onclick="triggerSimAction('word')" class="w-full text-left p-3 rounded-xl bg-gray-900/80 hover:bg-brand-900/40 border border-gray-800 hover:border-brand-500/50 transition flex items-center justify-between group">
+                                <div class="flex items-center gap-2.5">
+                                    <i class="fa-solid fa-file-word text-blue-400"></i>
+                                    <div>
+                                        <div class="text-xs font-bold text-white group-hover:text-cyber-blue">3. Ketik Dokumen Word</div>
+                                        <div class="text-[10px] text-gray-400">Ketik Keyboard $\rightarrow$ Save File to SSD/Storage</div>
+                                    </div>
+                                </div>
+                                <i class="fa-solid fa-play text-xs text-gray-500 group-hover:text-cyber-blue"></i>
+                            </button>
+
+                            <button onclick="triggerSimAction('whatsapp')" class="w-full text-left p-3 rounded-xl bg-gray-900/80 hover:bg-brand-900/40 border border-gray-800 hover:border-brand-500/50 transition flex items-center justify-between group">
+                                <div class="flex items-center gap-2.5">
+                                    <i class="fa-brands fa-whatsapp text-cyber-green"></i>
+                                    <div>
+                                        <div class="text-xs font-bold text-white group-hover:text-cyber-blue">4. Terima Pesan WhatsApp</div>
+                                        <div class="text-[10px] text-gray-400">OS Interupsi Jaringan $\rightarrow$ Display Notification</div>
+                                    </div>
+                                </div>
+                                <i class="fa-solid fa-play text-xs text-gray-500 group-hover:text-cyber-blue"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Scheduler Controls Panel -->
+                    <div id="panel-scheduler-controls" class="glass-panel p-5 rounded-2xl border border-gray-800 space-y-4 hidden">
+                        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-clock-rotate-left text-cyber-green"></i> OS CPU Scheduler & Multitasking
+                        </h3>
+                        <p class="text-xs text-gray-400">Sistem Operasi membagi waktu CPU (Time Slice) dalam fraksi milidetik agar semua aplikasi terasa berjalan bersamaan.</p>
+
+                        <!-- Scheduler Play/Pause Speed -->
+                        <div class="flex items-center gap-2">
+                            <button onclick="toggleSchedulerPlay()" id="btn-play-scheduler" class="flex-1 py-2 rounded-lg bg-cyber-green/20 text-cyber-green border border-cyber-green/30 font-semibold text-xs flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-pause" id="icon-play-scheduler"></i> <span id="text-play-scheduler">Jeda Scheduler</span>
+                            </button>
+                        </div>
+
+                        <!-- Running Applications Queue -->
+                        <div class="space-y-2">
+                            <label class="text-xs font-semibold text-gray-300">Aplikasi dalam Antrean Multitasking:</label>
+                            <div id="app-queue-list" class="space-y-1.5">
+                                <!-- App item elements injected dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Real-time CPU & RAM Usage Gauge -->
+                        <div class="p-3 rounded-xl bg-gray-900 border border-gray-800 space-y-3">
+                            <div>
+                                <div class="flex justify-between text-xs mb-1">
+                                    <span class="text-gray-400">Beban Kerja CPU:</span>
+                                    <span id="gauge-cpu-val" class="font-mono text-cyber-blue font-bold">45%</span>
+                                </div>
+                                <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden">
+                                    <div id="bar-cpu-val" class="bg-gradient-to-r from-cyber-blue to-brand-500 h-full transition-all duration-300" style="width: 45%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-xs mb-1">
+                                    <span class="text-gray-400">Penggunaan RAM:</span>
+                                    <span id="gauge-ram-val" class="font-mono text-cyber-green font-bold">3.8 / 8 GB</span>
+                                </div>
+                                <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden">
+                                    <div id="bar-ram-val" class="bg-gradient-to-r from-cyber-green to-emerald-400 h-full transition-all duration-300" style="width: 48%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 4: LKPD ==================== -->
+        <section id="section-lkpd" class="tab-content hidden space-y-6">
+            <div class="glass-panel p-6 rounded-2xl border border-gray-800">
+                <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-gray-800 pb-4 mb-6 gap-3">
+                    <div>
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-file-pen text-brand-500"></i>
+                            LKPD: Lembar Kerja Peserta Didik
+                        </h2>
+                        <p class="text-sm text-gray-400 mt-1">Elemen Sistem Komputer — Interaksi Manusia & Komputer serta Cara Kerja OS</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="saveLKPDLocal()" class="px-4 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-xs font-semibold text-gray-200 border border-gray-700 flex items-center gap-1.5">
+                            <i class="fa-solid fa-floppy-disk"></i> Simpan Draf
+                        </button>
+                        <button onclick="submitLKPDToSheets()" class="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-xs font-semibold text-white shadow-lg shadow-brand-500/25 flex items-center gap-1.5">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Kirim ke Guru / Sheets
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Identitas Kelompok / Siswa Form -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 p-4 rounded-xl bg-gray-900/60 border border-gray-800">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-300 mb-1">Nama Siswa *</label>
+                        <input type="text" id="lkpd-student-name" placeholder="Nama lengkap siswa" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500" oninput="syncUserIdentity()">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-300 mb-1">Kelas *</label>
+                        <input type="text" id="lkpd-student-class" placeholder="Contoh: X-Informatika 1" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500" oninput="syncUserIdentity()">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-300 mb-1">Nama Kelompok *</label>
+                        <input type="text" id="lkpd-student-group" placeholder="Contoh: Kelompok 2 (Kernel)" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500" oninput="syncUserIdentity()">
+                    </div>
+                </div>
+
+                <!-- Tujuan Pembelajaran Card -->
+                <div class="mb-6 p-4 rounded-xl bg-brand-900/20 border border-brand-500/30">
+                    <h4 class="text-xs font-bold text-brand-400 uppercase tracking-wider mb-2"><i class="fa-solid fa-bullseye mr-1"></i> Tujuan Pembelajaran LKPD:</h4>
+                    <ul class="list-disc list-inside text-xs text-gray-300 space-y-1">
+                        <li>Mengidentifikasi alur komponen input, antarmuka, software, dan output pada aktivitas digital.</li>
+                        <li>Menganalisis peran sistem operasi dan CPU scheduler dalam mengelola multitasking aplikasi.</li>
+                    </ul>
+                </div>
+
+                <!-- Aktivitas 1: Bedah Interaksi Digital -->
+                <div class="space-y-4 mb-8">
+                    <h3 class="text-md font-bold text-white flex items-center gap-2 border-l-4 border-cyber-blue pl-3">
+                        Aktivitas 1: Bedah Interaksi Digital
+                    </h3>
+                    <p class="text-xs text-gray-400">Analisislah komponen sistem komputer yang terlibat pada aktivitas digital berikut:</p>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs text-gray-300 border-collapse">
+                            <thead>
+                                <tr class="bg-gray-900 border-b border-gray-800 text-gray-400">
+                                    <th class="p-3">Aktivitas Digital</th>
+                                    <th class="p-3">Input (Piranti Masukan)</th>
+                                    <th class="p-3">Antarmuka (GUI/CLI/Audio)</th>
+                                    <th class="p-3">Software / Aplikasi</th>
+                                    <th class="p-3">Output (Perangkat Keluar)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-800/60 bg-gray-900/30">
+                                <tr>
+                                    <td class="p-3 font-semibold text-white">1. Mengedit Video</td>
+                                    <td class="p-2"><input type="text" id="lkpd-act1-1-input" value="Touchscreen / Mouse & Keyboard" class="w-full bg-gray-800 border border-gray-700 rounded p-1.5 text-xs text-white"></td>
+                                    <td class="p-2"><input type="text" id="lkpd-act1-1-gui" value="GUI (Timeline, Menu, Tombol)" class="w-full bg-gray-800 border border-gray-700 rounded p-1.5 text-xs text-white"></td>
+                                    <td class="p-2"><input type="text" id="lkpd-act1-1-app" value="CapCut / Premiere" class="w-full bg-gray-800 border border-gray-700 rounded p-1.5 text-xs text-white"></td>
+                                    <td class="p-2"><input type="text" id="lkpd-act1-1-out" value="Monitor Layar & Speaker" class="w-full bg-gray-800 border border-gray-700 rounded p-1.5 text-xs text-white"></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-semibold text-white">2. Mengambil Foto</td>
+                                    <td class="p-2"><input type="text" id="lkpd-act1-2-input" placeholder="Isi piranti masukan..." class="w-full bg-gray-800 border border-gray-700 rounded p-1.5 text-xs text-white"></td>
+                                    <td class="p-2"><input type="text" id="lkpd-act1-2-gui" placeholder="Isi jenis antarmuka..." class="w-full bg-gray-800 border border-gray-700 rounded p-1.5 text-xs text-white"></td>
+                                    <td class="p-2"><input type="text" id="lkpd-act1-2-app" placeholder="Isi nama software..." class="w-full bg-gray-800 border border-gray-700 rounded p-1.5 text-xs text-white"></td>
+                                    <td class="p-2"><input type="text" id="lkpd-act1-2-out" placeholder="Isi bentuk output..." class="w-full bg-gray-800 border border-gray-700 rounded p-1.5 text-xs text-white"></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-semibold text-white">3. Pencarian Suara (Voice Search)</td>
+                                    <td class="p-2"><input type="text" id="lkpd-act1-3-input" placeholder="Isi piranti masukan..." class="w-full bg-gray-800 border border-gray-700 rounded p-1.5 text-xs text-white"></td>
+                                    <td class="p-2"><input type="text" id="lkpd-act1-3-gui" placeholder="Isi jenis antarmuka..." class="w-full bg-gray-800 border border-gray-700 rounded p-1.5 text-xs text-white"></td>
+                                    <td class="p-2"><input type="text" id="lkpd-act1-3-app" placeholder="Isi nama software..." class="w-full bg-gray-800 border border-gray-700 rounded p-1.5 text-xs text-white"></td>
+                                    <td class="p-2"><input type="text" id="lkpd-act1-3-out" placeholder="Isi bentuk output..." class="w-full bg-gray-800 border border-gray-700 rounded p-1.5 text-xs text-white"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Aktivitas 2: Analisis Multitasking Sistem Operasi -->
+                <div class="space-y-4 mb-8">
+                    <h3 class="text-md font-bold text-white flex items-center gap-2 border-l-4 border-cyber-green pl-3">
+                        Aktivitas 2: Analisis Kasus Multitasking Sistem Operasi
+                    </h3>
+                    <div class="p-4 rounded-xl bg-gray-900/80 border border-gray-800 text-xs text-gray-300 space-y-2">
+                        <p class="font-semibold text-amber-300"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Studi Kasus:</p>
+                        <p>
+                            "Kamu sedang mengedit video di CapCut. Di saat yang sama, Chrome sedang terbuka dengan 5 tab, lagu diputar dari Music Player, dan WhatsApp Web menerima pesan baru."
+                        </p>
+                    </div>
+
+                    <div class="space-y-3 text-xs">
+                        <div>
+                            <label class="block font-semibold text-gray-200 mb-1">1. Mengapa aplikasi-aplikasi di atas seolah-olah dapat berjalan bersamaan di layar komputer?</label>
+                            <textarea id="lkpd-q-multitask" rows="2" placeholder="Jelaskan peran CPU Scheduler dan pembagian time-slice oleh Sistem Operasi..." class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2.5 text-white focus:border-brand-500 focus:outline-none"></textarea>
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-gray-200 mb-1">2. Apa yang akan terjadi pada laptop jika komputer TIDAK memiliki Sistem Operasi (OS)?</label>
+                            <textarea id="lkpd-q-noos" rows="2" placeholder="Jelaskan kendala aplikasi dan perangkat keras jika tidak ada OS..." class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2.5 text-white focus:border-brand-500 focus:outline-none"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Refleksi Peserta Didik -->
+                <div class="space-y-4">
+                    <h3 class="text-md font-bold text-white flex items-center gap-2 border-l-4 border-purple-500 pl-3">
+                        Refleksi Peserta Didik
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                        <div>
+                            <label class="block text-gray-300 font-semibold mb-1">Sebelum pembelajaran ini, saya mengira bahwa...</label>
+                            <textarea id="lkpd-ref1" rows="2" placeholder="Tuliskan pemahaman awalmu..." class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2.5 text-white focus:border-brand-500 focus:outline-none"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-gray-300 font-semibold mb-1">Setelah pembelajaran & simulasi ini, saya memahami bahwa...</label>
+                            <textarea id="lkpd-ref2" rows="2" placeholder="Tuliskan pemahaman barumu..." class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2.5 text-white focus:border-brand-500 focus:outline-none"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 5: POST-TEST (ASESMEN SUMATIF) ==================== -->
+        <section id="section-posttest" class="tab-content hidden space-y-6">
+            <div class="glass-panel p-6 rounded-2xl border border-gray-800">
+                <div class="flex items-center justify-between border-b border-gray-800 pb-4 mb-6">
+                    <div>
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-award text-cyber-gold"></i>
+                            Asesmen Sumatif (Post-Test)
+                        </h2>
+                        <p class="text-sm text-gray-400 mt-1">Uji pemahaman akhirmu mengenai Interaksi Manusia dan Komputer serta cara kerja Sistem Operasi.</p>
+                    </div>
+                    <span class="px-3 py-1 rounded-full bg-cyber-gold/10 text-cyber-gold border border-cyber-gold/30 text-xs font-mono">10 Soal Pilihan Ganda</span>
+                </div>
+
+                <!-- Posttest Form Container -->
+                <form id="posttest-form" class="space-y-6">
+                    <div id="posttest-questions" class="space-y-6">
+                        <!-- Posttest questions injected dynamically -->
+                    </div>
+
+                    <div class="pt-4 border-t border-gray-800 flex justify-end">
+                        <button type="button" onclick="submitPosttest()" class="px-6 py-2.5 rounded-xl bg-cyber-gold/90 hover:bg-cyber-gold text-gray-950 font-bold shadow-lg transition flex items-center gap-2">
+                            <i class="fa-solid fa-check-double"></i> Submit & Evaluasi Post-Test
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Posttest Score Modal/Result -->
+                <div id="posttest-result" class="hidden mt-6 p-6 rounded-xl bg-gray-900 border border-cyber-gold/50 text-center">
+                    <div class="w-16 h-16 rounded-full bg-cyber-gold/20 text-cyber-gold flex items-center justify-center text-3xl mx-auto mb-3">
+                        <i class="fa-solid fa-trophy"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white">Hasil Post-Test Pembelajaran</h3>
+                    <div class="my-4">
+                        <span id="posttest-score" class="text-4xl font-black text-cyber-gold font-mono">0</span>
+                        <span class="text-gray-400 font-bold">/ 100</span>
+                    </div>
+                    <p id="posttest-feedback" class="text-xs text-gray-300 max-w-lg mx-auto mb-4">Luar biasa! Pemahamanmu mengenai cara kerja software dan sistem operasi sangat baik.</p>
+                    <button onclick="submitLKPDToSheets()" class="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold transition flex items-center gap-2 mx-auto">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Sync Semua Nilai ke Google Sheets
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 6: PENGATURAN DATABASE & SPREADSHEET ==================== -->
+        <section id="section-settings" class="tab-content hidden space-y-6">
+            <div class="glass-panel p-6 rounded-2xl border border-gray-800">
+                <div class="flex items-center justify-between border-b border-gray-800 pb-4 mb-6">
+                    <div>
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-database text-cyber-green"></i>
+                            Koneksi Database Google Spreadsheet
+                        </h2>
+                        <p class="text-sm text-gray-400 mt-1">Hubungkan web media pembelajaran ini langsung dengan Google Sheets milik Guru.</p>
+                    </div>
+                    <span id="db-status-tag" class="px-3 py-1 rounded-full text-xs font-semibold bg-gray-800 text-gray-400 border border-gray-700">Tidak Terhubung</span>
+                </div>
+
+                <!-- Web App URL Input Box -->
+                <div class="p-4 rounded-xl bg-gray-900 border border-gray-800 space-y-3 mb-6">
+                    <label class="block text-xs font-semibold text-gray-200">Google Apps Script Web App URL *</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="sheets-script-url" placeholder="https://script.google.com/macros/s/AKfycbx.../exec" class="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500 font-mono">
+                        <button onclick="saveSheetsUrl()" class="px-4 py-2 bg-cyber-green text-gray-950 font-bold rounded-lg text-xs hover:bg-emerald-400 transition flex items-center gap-1">
+                            <i class="fa-solid fa-link"></i> Simpan Koneksi
+                        </button>
+                    </div>
+                    <p class="text-[11px] text-gray-400">URL ini didapat dari deployment Google Apps Script pada Spreadsheet Anda.</p>
+                </div>
+
+                <!-- Guide Accordion / Instructions for Teacher -->
+                <div class="p-5 rounded-xl bg-gray-900/60 border border-gray-800 space-y-4">
+                    <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-circle-question text-brand-400"></i>
+                        Panduan Guru: Menghubungkan ke Google Sheets (3 Langkah Mudah)
+                    </h3>
+                    
+                    <ol class="list-decimal list-inside text-xs text-gray-300 space-y-2 leading-relaxed">
+                        <li>Buat Spreadsheet Baru di Google Drive Anda. Sertakan header baris 1: <code class="bg-gray-800 px-1 py-0.5 rounded text-brand-300">Timestamp, Nama, Kelas, Kelompok, Nilai Pretest, Nilai Posttest, Jawaban LKPD, Refleksi</code>.</li>
+                        <li>Klik menu <strong class="text-white">Ekstensi $\rightarrow$ Apps Script</strong>, hapus kode lama dan **Paste** kode berikut:</li>
+                    </ol>
+
+                    <!-- Apps Script Code Box -->
+                    <div class="relative">
+                        <pre class="bg-gray-950 p-3 rounded-lg border border-gray-800 text-[11px] font-mono text-cyber-green overflow-x-auto">
+function doPost(e) {
+  try {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var data = JSON.parse(e.postData.contents);
+    
+    sheet.appendRow([
+      new Date(),
+      data.nama || "",
+      data.kelas || "",
+      data.kelompok || "",
+      data.pretestScore || 0,
+      data.posttestScore || 0,
+      JSON.stringify(data.lkpd || {}),
+      JSON.stringify(data.refleksi || {})
+    ]);
+    
+    return ContentService.createTextOutput(JSON.stringify({result: "success"}))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService.createTextOutput(JSON.stringify({result: "error", error: err.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}</pre>
+                        <button onclick="copyAppsScriptCode()" class="absolute top-2 right-2 px-2 py-1 rounded bg-gray-800 hover:bg-gray-700 text-gray-300 text-[10px] flex items-center gap-1">
+                            <i class="fa-regular fa-copy"></i> Salin Kode
+                        </button>
+                    </div>
+
+                    <ol start="3" class="list-decimal list-inside text-xs text-gray-300 space-y-1 leading-relaxed">
+                        <li>Klik <strong class="text-white">Deploy $\rightarrow$ New deployment</strong>. Pilih type <strong class="text-white">Web App</strong>, atur <i>Who has access</i> menjadi <strong class="text-cyber-green font-semibold">Anyone</strong>. Salin Web App URL dan tempel pada form di atas!</li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-gray-800 glass-panel py-4 text-center text-xs text-gray-500">
+        <p>© 2026 Media Pembelajaran Informatika Kelas X — Interaksi Manusia Komputer & Cara Kerja Software</p>
+    </footer>
+
+    <script>
+        /* ================= GLOBAL STATE & STORAGE ================= */
+        let state = {
+            userName: '',
+            userClass: '',
+            userGroup: '',
+            pretestScore: null,
+            posttestScore: null,
+            lkpdData: {},
+            sheetsUrl: localStorage.getItem('informatics_sheets_url') || '',
+            simMode: 'flow', // 'flow' or 'scheduler'
+            osActive: true,
+            schedulerRunning: true
+        };
+
+        // Questions Data
+        const pretestQuestionsData = [
+            { id: 1, q: "Komponen yang menghubungkan manusia (pengguna) dengan perangkat keras komputer disebut...", options: ["Perangkat Input", "Antarmuka (Interface)", "Power Supply", "Processor Core"], answer: 1 },
+            { id: 2, q: "Tampilan komputer yang menggunakan tombol visual, menu, dan ikon disebut...", options: ["CLI", "Audio Interface", "GUI (Graphical User Interface)", "BIOS"], answer: 2 },
+            { id: 3, q: "Sistem Operasi (OS) termasuk dalam kelompok software jenis...", options: ["Application Software", "System Software", "Malware", "Design Software"], answer: 1 },
+            { id: 4, q: "Manakah di bawah ini yang merupakan fungsi utama Sistem Operasi?", options: ["Membuat desain grafis otomatis", "Mengelola memori, prosesor, dan file", "Menyambungkan listrik ke CPU", "Mendinginkan fan komputer"], answer: 1 },
+            { id: 5, q: "Kemampuan komputer menjalankan beberapa aplikasi seolah-olah bersamaan dinamakan...", options: ["Multitasking", "Overclocking", "Formatting", "Downloading"], answer: 0 }
+        ];
+
+        const posttestQuestionsData = [
+            { id: 1, q: "Manakah contoh antarmuka berbasis Command Line Interface (CLI)?", options: ["Ikon Windows Explorer", "Terminal / Command Prompt", "Tombol layar sentuh Smartphone", "Voice Command Siri"], answer: 1 },
+            { id: 2, q: "Ketika kamu mengetik di keyboard, komponen pertama yang menerima sinyal masukan tersebut adalah...", options: ["Monitor", "Piranti Masukan (Input Hardware) & Driver", "Aplikasi CapCut", "Harddisk Storage"], answer: 1 },
+            { id: 3, q: "Jika laptop memiliki CPU, RAM, dan SSD lengkap namun TIDAK memiliki Sistem Operasi, apa yang terjadi saat dinyalakan?", options: ["Langsung bisa membuka Google Chrome", "Komputer tidak dapat mengelola hardware & aplikasi tidak bisa berjalan", "Aplikasi CapCut berjalan lebih cepat", "Layar monitor menampilkan gambar 3D"], answer: 1 },
+            { id: 4, q: "Peran CPU Scheduler pada Sistem Operasi adalah...", options: ["Membagi waktu giliran CPU (Time Slice) antar aplikasi", "Menyimpan file dokumen secara permanen", "Mengisi daya baterai laptop", "Menghapus virus di RAM"], answer: 0 },
+            { id: 5, q: "Manakah pasangan aplikasi & jenis software yang benar?", options: ["Windows 11 - Application Software", "CapCut - System Software", "Android - System Software", "Google Chrome - Hardware"], answer: 2 },
+            { id: 6, q: "Interaksi komputer menggunakan kamera untuk mengenali wajah pengguna merupakan jenis antarmuka...", options: ["CLI", "Gambar / Video", "Audio Interface", "Touch Interface"], answer: 1 },
+            { id: 7, q: "Di mana program/aplikasi disimpan saat sedang DIBUKA dan DIJALANKAN oleh pengguna?", options: ["RAM (Random Access Memory)", "Keyboard", "Power Supply", "Monitor Display"], answer: 0 },
+            { id: 8, q: "Mengapa suara dari Spotify tetap dapat terdengar saat kita sedang mengetik dokumen di Ms Word?", options: ["Karena Ms Word menyatukan audio", "Karena OS melakukan multitasking & pengalokasian sumber daya", "Karena RAM tidak digunakan", "Karena CPU tidak bekerja"], answer: 1 },
+            { id: 9, q: "Manakah yang BUKAN merupakan fungsi Sistem Operasi?", options: ["Mengelola file dan folder", "Menangani keamanan jaringan", "Mengontrol perangkat periferal", "Mencetak kertas secara fisik tanpa printer"], answer: 3 },
+            { id: 10, q: "Urutan alur interaksi komputasi yang benar adalah...", options: ["Hardware -> User -> OS -> App", "User -> Interface -> App -> OS -> Hardware -> Output", "OS -> Hardware -> User -> Interface", "App -> Hardware -> Output -> User"], answer: 1 }
+        ];
+
+        /* ================= THREE.JS 3D SIMULATOR ENGINE ================= */
+        let scene, camera, renderer, controls;
+        let cpuMesh, ramMeshes = [], osCoreMesh, appMeshes = {}, displayMesh, inputMesh;
+        let signalParticles = [];
+        let activeAppKey = 'chrome';
+
+        const appColors = {
+            chrome: 0x00f0ff,
+            capcut: 0xff0055,
+            word: 0x3b82f6,
+            whatsapp: 0x00ff66,
+            music: 0xffb700
+        };
+
+        function init3DScene() {
+            const container = document.getElementById('canvas-container');
+            if(!container) return;
+
+            // 1. Scene setup
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0a0e17);
+            scene.fog = new THREE.FogExp2(0x0a0e17, 0.03);
+
+            // 2. Camera setup
+            camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.set(0, 12, 22);
+
+            // 3. Renderer setup
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.shadowMap.enabled = true;
+            container.appendChild(renderer.domElement);
+
+            // 4. Orbit Controls
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.maxPolarAngle = Math.PI / 2 - 0.05;
+
+            // 5. Lights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+
+            const dirLight = new THREE.DirectionalLight(0x6366f1, 1.2);
+            dirLight.position.set(10, 20, 10);
+            scene.add(dirLight);
+
+            const pointLight = new THREE.PointLight(0x00f0ff, 1.5, 30);
+            pointLight.position.set(0, 4, 0);
+            scene.add(pointLight);
+
+            // 6. Build Grid Motherboard Floor
+            const gridHelper = new THREE.GridHelper(30, 30, 0x4f46e5, 0x1e293b);
+            gridHelper.position.y = -1;
+            scene.add(gridHelper);
+
+            // --- BUILD 3D HARDWARE COMPONENTS ---
+            // CPU Core
+            const cpuGeo = new THREE.BoxGeometry(3, 0.6, 3);
+            const cpuMat = new THREE.MeshStandardMaterial({ color: 0x1e1b4b, metalness: 0.8, roughness: 0.2 });
+            cpuMesh = new THREE.Mesh(cpuGeo, cpuMat);
+            cpuMesh.position.set(0, 0, 0);
+            scene.add(cpuMesh);
+
+            // CPU Glowing Inner Core
+            const cpuCoreGeo = new THREE.BoxGeometry(1.2, 0.7, 1.2);
+            const cpuCoreMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff });
+            const cpuInner = new THREE.Mesh(cpuCoreGeo, cpuCoreMat);
+            cpuMesh.add(cpuInner);
+
+            // RAM Modules
+            for(let i = -1; i <= 1; i += 2) {
+                const ramGeo = new THREE.BoxGeometry(0.3, 1.2, 3.5);
+                const ramMat = new THREE.MeshStandardMaterial({ color: 0x065f46, metalness: 0.5 });
+                const ram = new THREE.Mesh(ramGeo, ramMat);
+                ram.position.set(i * 3.5, 0.3, 0);
+                scene.add(ram);
+                ramMeshes.push(ram);
+            }
+
+            // OS Core (Floating Center Orb)
+            const osGeo = new THREE.IcosahedronGeometry(1.2, 2);
+            const osMat = new THREE.MeshStandardMaterial({ color: 0x6366f1, wireframe: true, emissive: 0x4338ca });
+            osCoreMesh = new THREE.Mesh(osGeo, osMat);
+            osCoreMesh.position.set(0, 3.5, 0);
+            scene.add(osCoreMesh);
+
+            // Applications (Hovering Cubes around OS Core)
+            const appKeys = ['chrome', 'capcut', 'word', 'whatsapp', 'music'];
+            const radius = 5;
+            appKeys.forEach((key, index) => {
+                const angle = (index / appKeys.length) * Math.PI * 2;
+                const appGeo = new THREE.BoxGeometry(1, 1, 1);
+                const appMat = new THREE.MeshStandardMaterial({ color: appColors[key], roughness: 0.3 });
+                const appBox = new THREE.Mesh(appGeo, appMat);
+                
+                appBox.position.set(Math.cos(angle) * radius, 4.5, Math.sin(angle) * radius);
+                scene.add(appBox);
+                appMeshes[key] = appBox;
+            });
+
+            // Display / Output Monitor
+            const dispGeo = new THREE.BoxGeometry(6, 3.5, 0.2);
+            const dispMat = new THREE.MeshStandardMaterial({ color: 0x0f172a });
+            displayMesh = new THREE.Mesh(dispGeo, dispMat);
+            displayMesh.position.set(0, 2, -7);
+            scene.add(displayMesh);
+
+            // Input Keyboard/Mouse Node
+            const inputGeo = new THREE.BoxGeometry(5, 0.2, 2);
+            const inputMat = new THREE.MeshStandardMaterial({ color: 0x334155 });
+            inputMesh = new THREE.Mesh(inputGeo, inputMat);
+            inputMesh.position.set(0, -0.8, 7);
+            scene.add(inputMesh);
+
+            // Resize Listener
+            window.addEventListener('resize', onWindowResize);
+
+            // Start Animation Loop
+            animate3D();
+        }
+
+        function animate3D() {
+            requestAnimationFrame(animate3D);
+
+            // Rotate OS Core
+            if(osCoreMesh && state.osActive) {
+                osCoreMesh.rotation.y += 0.01;
+                osCoreMesh.rotation.x += 0.005;
+            }
+
+            // Animate Apps Hovering
+            let time = Date.now() * 0.002;
+            Object.keys(appMeshes).forEach((key, i) => {
+                if(appMeshes[key]) {
+                    appMeshes[key].position.y = 4.5 + Math.sin(time + i) * 0.2;
+                    appMeshes[key].rotation.y += 0.01;
+                }
+            });
+
+            // Animate Signal Data Packets
+            for (let i = signalParticles.length - 1; i >= 0; i--) {
+                let p = signalParticles[i];
+                p.progress += p.speed;
+                p.mesh.position.lerpVectors(p.startPos, p.endPos, p.progress);
+                if (p.progress >= 1) {
+                    scene.remove(p.mesh);
+                    signalParticles.splice(i, 1);
+                }
+            }
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            const container = document.getElementById('canvas-container');
+            if(!container || !renderer || !camera) return;
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        }
+
+        function reset3DCamera() {
+            camera.position.set(0, 12, 22);
+            controls.target.set(0, 0, 0);
+        }
+
+        // Emit Visual Data Signals between 3D Components
+        function createDataSignal(startVec, endVec, colorHex = 0x00f0ff) {
+            const pGeo = new THREE.SphereGeometry(0.2, 8, 8);
+            const pMat = new THREE.MeshBasicMaterial({ color: colorHex });
+            const pMesh = new THREE.Mesh(pGeo, pMat);
+            pMesh.position.copy(startVec);
+            scene.add(pMesh);
+
+            signalParticles.push({
+                mesh: pMesh,
+                startPos: startVec.clone(),
+                endPos: endVec.clone(),
+                progress: 0,
+                speed: 0.03
+            });
+        }
+
+        /* ================= SIMULATION CONTROLS & INTERACTION ================= */
+        function setSimMode(mode) {
+            state.simMode = mode;
+            document.querySelectorAll('.sim-mode-btn').forEach(b => {
+                b.classList.remove('bg-brand-600', 'text-white', 'border-brand-400');
+                b.classList.add('bg-gray-800', 'text-gray-300');
+            });
+
+            if(mode === 'flow') {
+                document.getElementById('btn-mode-flow').classList.add('bg-brand-600', 'text-white', 'border-brand-400');
+                document.getElementById('panel-flow-controls').classList.remove('hidden');
+                document.getElementById('panel-scheduler-controls').classList.add('hidden');
+                document.getElementById('sim-instruction-text').innerText = "Klik aksi perintah di kanan untuk melihat alur data sinyal!";
+            } else {
+                document.getElementById('btn-mode-scheduler').classList.add('bg-brand-600', 'text-white', 'border-brand-400');
+                document.getElementById('panel-flow-controls').classList.add('hidden');
+                document.getElementById('panel-scheduler-controls').classList.remove('hidden');
+                document.getElementById('sim-instruction-text').innerText = "Simulasi OS CPU Scheduler bergantian mengeksekusi aplikasi multitasking.";
+                renderSchedulerQueue();
+            }
+        }
+
+        function toggleOSState() {
+            state.osActive = !state.osActive;
+            const btn = document.getElementById('btn-toggle-os');
+            if(state.osActive) {
+                btn.className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-600/50 transition";
+                btn.innerHTML = '<i class="fa-solid fa-power-off"></i> Status OS: AKTIF';
+                if(osCoreMesh) osCoreMesh.material.color.setHex(0x6366f1);
+                showToast("Sistem Operasi Dinyalakan. Hardware & Aplikasi dapat berkomunikasi.", "success");
+            } else {
+                btn.className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-rose-600/30 text-rose-300 border border-rose-500/40 hover:bg-rose-600/50 transition";
+                btn.innerHTML = '<i class="fa-solid fa-power-off"></i> Status OS: MATI';
+                if(osCoreMesh) osCoreMesh.material.color.setHex(0x334155);
+                showToast("Sistem Operasi dimatikan! Komputer gagal memproses perintah aplikasi.", "error");
+            }
+        }
+
+        function triggerSimAction(appKey) {
+            if(!state.osActive) {
+                showToast("Gagal! Komputer tidak memiliki Sistem Operasi (OS) aktif.", "error");
+                document.getElementById('hud-signal-status').innerText = "Gagal (Tanpa OS)";
+                return;
+            }
+
+            activeAppKey = appKey;
+            document.getElementById('hud-active-app').innerText = appKey.toUpperCase() + ".exe";
+            document.getElementById('hud-signal-status').innerText = "Processing Data...";
+
+            const color = appColors[appKey];
+
+            // Sequence 1: Input -> App
+            createDataSignal(inputMesh.position, appMeshes[appKey].position, color);
+            
+            // Sequence 2: App -> OS Core
+            setTimeout(() => {
+                createDataSignal(appMeshes[appKey].position, osCoreMesh.position, color);
+            }, 400);
+
+            // Sequence 3: OS -> CPU
+            setTimeout(() => {
+                createDataSignal(osCoreMesh.position, cpuMesh.position, color);
+            }, 800);
+
+            // Sequence 4: CPU -> RAM & Display Output
+            setTimeout(() => {
+                createDataSignal(cpuMesh.position, ramMeshes[0].position, color);
+                createDataSignal(cpuMesh.position, displayMesh.position, color);
+                document.getElementById('hud-signal-status').innerText = "Selesai (Output Rendered)";
+            }, 1200);
+        }
+
+        // Scheduler App Queue
+        const schedulerApps = [
+            { id: 'chrome', name: 'Google Chrome', cpu: '35%', ram: '1.2 GB', icon: 'fa-globe', color: 'text-cyber-blue' },
+            { id: 'capcut', name: 'CapCut Video', cpu: '60%', ram: '2.4 GB', icon: 'fa-video', color: 'text-cyber-pink' },
+            { id: 'word', name: 'Microsoft Word', cpu: '10%', ram: '400 MB', icon: 'fa-file-word', color: 'text-blue-400' },
+            { id: 'whatsapp', name: 'WhatsApp Web', cpu: '15%', ram: '600 MB', icon: 'fa-whatsapp', color: 'text-cyber-green' }
+        ];
+        let currentSchedulerIndex = 0;
+        let schedulerInterval = null;
+
+        function renderSchedulerQueue() {
+            const container = document.getElementById('app-queue-list');
+            container.innerHTML = '';
+            
+            schedulerApps.forEach((app, idx) => {
+                const isActive = idx === currentSchedulerIndex;
+                const el = document.createElement('div');
+                el.className = `p-2.5 rounded-xl border flex items-center justify-between text-xs transition ${
+                    isActive ? 'bg-brand-900/60 border-brand-500 text-white' : 'bg-gray-900/40 border-gray-800 text-gray-400'
+                }`;
+                el.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid ${app.icon} ${app.color}"></i>
+                        <span class="font-semibold">${app.name}</span>
+                    </div>
+                    <span class="text-[10px] font-mono ${isActive ? 'text-cyber-green font-bold' : 'text-gray-500'}">
+                        ${isActive ? 'RUNNING (CPU Core 0)' : 'WAITING'}
+                    </span>
+                `;
+                container.appendChild(el);
+            });
+        }
+
+        function startSchedulerLoop() {
+            if(schedulerInterval) clearInterval(schedulerInterval);
+            schedulerInterval = setInterval(() => {
+                if(!state.schedulerRunning || !state.osActive) return;
+                currentSchedulerIndex = (currentSchedulerIndex + 1) % schedulerApps.length;
+                renderSchedulerQueue();
+                
+                const active = schedulerApps[currentSchedulerIndex];
+                document.getElementById('hud-active-app').innerText = active.name;
+                
+                // Signal 3D OS -> CPU
+                if(osCoreMesh && cpuMesh) {
+                    createDataSignal(osCoreMesh.position, cpuMesh.position, appColors[active.id]);
+                }
+            }, 2000);
+        }
+
+        function toggleSchedulerPlay() {
+            state.schedulerRunning = !state.schedulerRunning;
+            const btnText = document.getElementById('text-play-scheduler');
+            const btnIcon = document.getElementById('icon-play-scheduler');
+            if(state.schedulerRunning) {
+                btnText.innerText = "Jeda Scheduler";
+                btnIcon.className = "fa-solid fa-pause";
+            } else {
+                btnText.innerText = "Jalankan Scheduler";
+                btnIcon.className = "fa-solid fa-play";
+            }
+        }
+
+        /* ================= QUIZ & LKPD LOGIC ================= */
+        function renderQuizzes() {
+            // Render Pretest Questions
+            const preContainer = document.getElementById('pretest-questions');
+            preContainer.innerHTML = pretestQuestionsData.map((q, idx) => `
+                <div class="p-4 rounded-xl bg-gray-900/80 border border-gray-800 space-y-3">
+                    <p class="text-sm font-semibold text-white">${idx + 1}. ${q.q}</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                        ${q.options.map((opt, oIdx) => `
+                            <label class="p-2.5 rounded-lg bg-gray-800/80 hover:bg-gray-700/80 border border-gray-700 flex items-center gap-2 cursor-pointer text-gray-300">
+                                <input type="radio" name="pretest-q-${q.id}" value="${oIdx}" class="text-brand-500 focus:ring-0">
+                                <span>${opt}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+
+            // Render Posttest Questions
+            const postContainer = document.getElementById('posttest-questions');
+            postContainer.innerHTML = posttestQuestionsData.map((q, idx) => `
+                <div class="p-4 rounded-xl bg-gray-900/80 border border-gray-800 space-y-3">
+                    <p class="text-sm font-semibold text-white">${idx + 1}. ${q.q}</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                        ${q.options.map((opt, oIdx) => `
+                            <label class="p-2.5 rounded-lg bg-gray-800/80 hover:bg-gray-700/80 border border-gray-700 flex items-center gap-2 cursor-pointer text-gray-300">
+                                <input type="radio" name="posttest-q-${q.id}" value="${oIdx}" class="text-cyber-gold focus:ring-0">
+                                <span>${opt}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function syncUserIdentity() {
+            const name = document.getElementById('lkpd-student-name').value || document.getElementById('pretest-student-name').value;
+            const cls = document.getElementById('lkpd-student-class').value || document.getElementById('pretest-student-class').value;
+            const grp = document.getElementById('lkpd-student-group').value;
+
+            if(name) state.userName = name;
+            if(cls) state.userClass = cls;
+            if(grp) state.userGroup = grp;
+
+            document.getElementById('display-user-name').innerText = state.userName || 'Belum Mengisi Identitas';
+            document.getElementById('display-user-group').innerText = (state.userClass || '') + ' ' + (state.userGroup ? `(${state.userGroup})` : '');
+        }
+
+        function submitPretest() {
+            syncUserIdentity();
+            if(!state.userName) {
+                showToast("Harap isi Nama Lengkap Siswa terlebih dahulu!", "error");
+                return;
+            }
+
+            let correct = 0;
+            pretestQuestionsData.forEach(q => {
+                const selected = document.querySelector(`input[name="pretest-q-${q.id}"]:checked`);
+                if(selected && parseInt(selected.value) === q.answer) {
+                    correct++;
+                }
+            });
+
+            state.pretestScore = Math.round((correct / pretestQuestionsData.length) * 100);
+            document.getElementById('pretest-score').innerText = state.pretestScore;
+            document.getElementById('pretest-result').classList.remove('hidden');
+            showToast(`Pre-test berhasil disimpan! Skor: ${state.pretestScore}`, "success");
+            
+            autoSyncSheets();
+        }
+
+        function submitPosttest() {
+            syncUserIdentity();
+            if(!state.userName) {
+                showToast("Harap isi Nama Lengkap Siswa di tab LKPD atau Pretest!", "error");
+                return;
+            }
+
+            let correct = 0;
+            posttestQuestionsData.forEach(q => {
+                const selected = document.querySelector(`input[name="posttest-q-${q.id}"]:checked`);
+                if(selected && parseInt(selected.value) === q.answer) {
+                    correct++;
+                }
+            });
+
+            state.posttestScore = Math.round((correct / posttestQuestionsData.length) * 100);
+            document.getElementById('posttest-score').innerText = state.posttestScore;
+            document.getElementById('posttest-result').classList.remove('hidden');
+            showToast(`Post-test Selesai! Skor: ${state.posttestScore}`, "success");
+
+            autoSyncSheets();
+        }
+
+        function saveLKPDLocal() {
+            syncUserIdentity();
+            state.lkpdData = {
+                act1_1: { input: document.getElementById('lkpd-act1-1-input').value, gui: document.getElementById('lkpd-act1-1-gui').value, app: document.getElementById('lkpd-act1-1-app').value, out: document.getElementById('lkpd-act1-1-out').value },
+                act1_2: { input: document.getElementById('lkpd-act1-2-input').value, gui: document.getElementById('lkpd-act1-2-gui').value, app: document.getElementById('lkpd-act1-2-app').value, out: document.getElementById('lkpd-act1-2-out').value },
+                act1_3: { input: document.getElementById('lkpd-act1-3-input').value, gui: document.getElementById('lkpd-act1-3-gui').value, app: document.getElementById('lkpd-act1-3-app').value, out: document.getElementById('lkpd-act1-3-out').value },
+                q_multitask: document.getElementById('lkpd-q-multitask').value,
+                q_noos: document.getElementById('lkpd-q-noos').value,
+                ref1: document.getElementById('lkpd-ref1').value,
+                ref2: document.getElementById('lkpd-ref2').value
+            };
+            localStorage.setItem('informatics_lkpd_draft', JSON.stringify(state.lkpdData));
+            showToast("Draf LKPD tersimpan di memori lokal peramban.", "success");
+        }
+
+        /* ================= GOOGLE SHEETS INTEGRATION ================= */
+        function saveSheetsUrl() {
+            const url = document.getElementById('sheets-script-url').value.trim();
+            if(!url.startsWith('https://script.google.com')) {
+                showToast("URL tidak valid! Harus diawali dengan https://script.google.com", "error");
+                return;
+            }
+            state.sheetsUrl = url;
+            localStorage.setItem('informatics_sheets_url', url);
+            updateDbStatusTag(true);
+            showToast("Koneksi Google Sheets berhasil disimpan!", "success");
+        }
+
+        function updateDbStatusTag(connected) {
+            const tag = document.getElementById('db-status-tag');
+            const badge = document.getElementById('sync-status-badge');
+            if(connected) {
+                tag.className = "px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40";
+                tag.innerText = "Terhubung ke Google Sheets";
+                badge.className = "px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5";
+                badge.innerHTML = '<i class="fa-solid fa-cloud-check"></i> Sheets Terhubung';
+            } else {
+                tag.className = "px-3 py-1 rounded-full text-xs font-semibold bg-gray-800 text-gray-400 border border-gray-700";
+                tag.innerText = "Tidak Terhubung";
+            }
+        }
+
+        function autoSyncSheets() {
+            if(state.sheetsUrl) {
+                submitLKPDToSheets();
+            }
+        }
+
+        async function submitLKPDToSheets() {
+            syncUserIdentity();
+            saveLKPDLocal();
+
+            if(!state.userName) {
+                showToast("Harap isi Nama Siswa terlebih dahulu di LKPD!", "error");
+                return;
+            }
+
+            if(!state.sheetsUrl) {
+                showToast("Sheets URL belum terhubung. Menggunakan mode penyimpanan lokal.", "warning");
+                return;
+            }
+
+            const payload = {
+                nama: state.userName,
+                kelas: state.userClass,
+                kelompok: state.userGroup,
+                pretestScore: state.pretestScore !== null ? state.pretestScore : 'Belum Pretest',
+                posttestScore: state.posttestScore !== null ? state.posttestScore : 'Belum Posttest',
+                lkpd: state.lkpdData,
+                refleksi: {
+                    sebelum: state.lkpdData.ref1 || '',
+                    sesudah: state.lkpdData.ref2 || ''
+                }
+            };
+
+            showToast("Mengirim data ke Google Sheets...", "info");
+
+            try {
+                // Using no-cors mode to support standard Web App endpoints smoothly
+                await fetch(state.sheetsUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                showToast("Data LKPD & Nilai berhasil terkirim ke Google Spreadsheet!", "success");
+            } catch(err) {
+                console.error(err);
+                showToast("Gagal mengirim ke Sheets! Periksa koneksi internet.", "error");
+            }
+        }
+
+        function copyAppsScriptCode() {
+            const code = `function doPost(e) {
+  try {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var data = JSON.parse(e.postData.contents);
+    
+    sheet.appendRow([
+      new Date(),
+      data.nama || "",
+      data.kelas || "",
+      data.kelompok || "",
+      data.pretestScore || 0,
+      data.posttestScore || 0,
+      JSON.stringify(data.lkpd || {}),
+      JSON.stringify(data.refleksi || {})
+    ]);
+    
+    return ContentService.createTextOutput(JSON.stringify({result: "success"}))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService.createTextOutput(JSON.stringify({result: "error", error: err.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}`;
+            navigator.clipboard.writeText(code);
+            showToast("Kode Google Apps Script berhasil disalin!", "success");
+        }
+
+        /* ================= UI NAVIGATION SWITCHING ================= */
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(sec => sec.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-brand-600', 'text-white', 'shadow-md');
+                btn.classList.add('text-gray-400');
+            });
+
+            const activeSec = document.getElementById(`section-${tabId}`);
+            const activeNav = document.getElementById(`nav-${tabId}`);
+
+            if(activeSec) activeSec.classList.remove('hidden');
+            if(activeNav) {
+                activeNav.classList.add('active', 'bg-brand-600', 'text-white', 'shadow-md');
+                activeNav.classList.remove('text-gray-400');
+            }
+
+            if(tabId === 'simulasi') {
+                setTimeout(onWindowResize, 100);
+            }
+        }
+
+        function switchMateriSubTab(subId) {
+            document.querySelectorAll('.materi-subcontent').forEach(m => m.classList.add('hidden'));
+            document.querySelectorAll('#section-materi button').forEach(b => {
+                b.classList.remove('bg-brand-600', 'text-white');
+                b.classList.add('bg-gray-800', 'text-gray-400');
+            });
+
+            document.getElementById(subId).classList.remove('hidden');
+            const navBtn = document.getElementById(`subnav-${subId}`);
+            if(navBtn) {
+                navBtn.classList.add('bg-brand-600', 'text-white');
+                navBtn.classList.remove('bg-gray-800', 'text-gray-400');
+            }
+        }
+
+        function showToast(msg, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            let bg = 'bg-gray-900 border-gray-700 text-white';
+            if(type === 'success') bg = 'bg-emerald-950/90 border-emerald-500 text-emerald-200';
+            if(type === 'error') bg = 'bg-rose-950/90 border-rose-500 text-rose-200';
+            if(type === 'warning') bg = 'bg-amber-950/90 border-amber-500 text-amber-200';
+
+            toast.className = `p-3 rounded-xl border shadow-xl text-xs font-medium flex items-center gap-2 transition-all duration-300 transform translate-x-10 ${bg}`;
+            toast.innerHTML = `<i class="fa-solid fa-circle-info"></i> <span>${msg}</span>`;
+            
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.remove('translate-x-10'), 10);
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'scale-95');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        /* ================= INITIALIZATION ================= */
+        window.onload = function() {
+            // Render quiz questions
+            renderQuizzes();
+
+            // Initialize 3D Engine Scene
+            init3DScene();
+
+            // Check saved sheets URL
+            if(state.sheetsUrl) {
+                const sheetsInput = document.getElementById('sheets-script-url');
+                if (sheetsInput) sheetsInput.value = state.sheetsUrl;
+                updateDbStatusTag(true);
+            }
+
+            // Start Scheduler Animation Loop
+            startSchedulerLoop();
+        };
+    </script>
+</body>
+</html>
