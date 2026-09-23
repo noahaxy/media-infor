@@ -809,7 +809,7 @@ function doPost(e) {
             pretestScore: null,
             posttestScore: null,
             lkpdData: {},
-            sheetsUrl: localStorage.getItem('informatics_sheets_url') || '',
+            sheetsUrl: localStorage.getItem('informatics_sheets_url') || 'https://script.google.com/macros/s/AKfycbxJWRp6gkMBgal91zrjeqP8KN88Ny7y8I9wTbKhHYIxiNx4G9ls8jHDZwJgq4PG4CYBhA/exec',
             simMode: 'flow', // 'flow' or 'scheduler'
             osActive: true,
             schedulerRunning: true
@@ -1274,7 +1274,7 @@ function doPost(e) {
                 return;
             }
             state.sheetsUrl = url;
-            localStorage.setItem('https://script.google.com/macros/s/AKfycbxJWRp6gkMBgal91zrjeqP8KN88Ny7y8I9wTbKhHYIxiNx4G9ls8jHDZwJgq4PG4CYBhA/exec', url);
+            localStorage.setItem('informatics_sheets_url', url);
             updateDbStatusTag(true);
             showToast("Koneksi Google Sheets berhasil disimpan!", "success");
         }
